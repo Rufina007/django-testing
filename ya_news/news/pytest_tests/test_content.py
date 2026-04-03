@@ -1,23 +1,20 @@
 import pytest
 from django.conf import settings
-from django.urls import reverse
 
 from news.forms import CommentForm
 
 
 pytestmark = pytest.mark.django_db
 
-HOME_URL = reverse('news:home')
 
-
-def test_news_count(many_news, client):
-    response = client.get(HOME_URL)
+def test_news_count(many_news, client, home_url):
+    response = client.get(home_url)
     object_list = response.context['object_list']
     assert object_list.count() == settings.NEWS_COUNT_ON_HOME_PAGE
 
 
-def test_news_order(many_news, client):
-    response = client.get(HOME_URL)
+def test_news_order(many_news, client, home_url):
+    response = client.get(home_url)
     object_list = response.context['object_list']
     all_dates = [news.date for news in object_list]
     sorted_dates = sorted(all_dates, reverse=True)

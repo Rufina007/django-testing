@@ -1,7 +1,6 @@
 from http import HTTPStatus
 
 from pytils.translit import slugify
-
 from notes.forms import WARNING
 from notes.models import Note
 
@@ -23,11 +22,11 @@ class TestNoteCreation(BaseTestCase):
         self.assertEqual(Note.objects.count(), initial_count)
 
     def test_user_can_create_note(self):
-        initial_count = Note.objects.count()
+        Note.objects.all().delete()
         response = self.author_client.post(self.add_url, data=FORM_DATA)
         self.assertRedirects(response, self.success_url)
-        self.assertEqual(Note.objects.count(), initial_count + 1)
-        note = Note.objects.get(slug=FORM_DATA['slug'])
+        self.assertEqual(Note.objects.count(), 1)
+        note = Note.objects.get()
         self.assertEqual(note.title, FORM_DATA['title'])
         self.assertEqual(note.text, FORM_DATA['text'])
         self.assertEqual(note.author, self.author)
@@ -44,14 +43,13 @@ class TestNoteCreation(BaseTestCase):
         )
 
     def test_empty_slug(self):
-        initial_count = Note.objects.count()
-        form_data = {k: v for k, v in FORM_DATA.items() if k != 'slug'}
+        Note.objects.all().delete()
+        form_data = {'title': FORM_DATA['title'], 'text': FORM_DATA['text']}
         response = self.author_client.post(self.add_url, data=form_data)
         self.assertRedirects(response, self.success_url)
-        self.assertEqual(Note.objects.count(), initial_count + 1)
-        expected_slug = slugify(form_data['title'])
-        note = Note.objects.get(slug=expected_slug)
-        self.assertEqual(note.slug, expected_slug)
+        self.assertEqual(Note.objects.count(), 1)
+        note = Note.objects.get()
+        self.assertEqual(note.slug, slugify(form_data['title']))
 
 
 class TestNoteEditDelete(BaseTestCase):

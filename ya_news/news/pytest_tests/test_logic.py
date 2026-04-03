@@ -20,11 +20,11 @@ def test_anonymous_user_cant_create_comment(client, detail_url):
 
 def test_user_can_create_comment(
         author_client, author, news, detail_url):
-    initial_count = Comment.objects.count()
+    Comment.objects.all().delete()
     response = author_client.post(detail_url, data=FORM_DATA)
     assertRedirects(response, f'{detail_url}#comments')
-    assert Comment.objects.count() == initial_count + 1
-    comment = Comment.objects.get(text=FORM_DATA['text'])
+    assert Comment.objects.count() == 1
+    comment = Comment.objects.get()
     assert comment.news == news
     assert comment.author == author
 

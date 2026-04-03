@@ -66,6 +66,26 @@ def delete_url(comment):
 
 
 @pytest.fixture
+def home_url():
+    return reverse('news:home')
+
+
+@pytest.fixture
+def login_url():
+    return reverse('users:login')
+
+
+@pytest.fixture
+def signup_url():
+    return reverse('users:signup')
+
+
+@pytest.fixture
+def logout_url():
+    return reverse('users:logout')
+
+
+@pytest.fixture
 def many_news(db):
     today = datetime.today()
     News.objects.bulk_create(

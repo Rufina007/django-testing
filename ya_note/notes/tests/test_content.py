@@ -1,5 +1,4 @@
 from notes.forms import NoteForm
-
 from .base import BaseTestCase
 
 

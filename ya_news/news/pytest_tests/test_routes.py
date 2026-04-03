@@ -1,29 +1,35 @@
 from http import HTTPStatus
 
 import pytest
-from django.urls import reverse
 from pytest_django.asserts import assertRedirects
 
-
-HOME_URL = reverse('news:home')
-LOGIN_URL = reverse('users:login')
-SIGNUP_URL = reverse('users:signup')
-LOGOUT_URL = reverse('users:logout')
 
 pytestmark = pytest.mark.django_db
 
 
-def test_logout_for_anonymous_user(client):
-    response = client.post(LOGOUT_URL)
+def test_logout_for_anonymous_user(client, logout_url):
+    response = client.post(logout_url)
     assert response.status_code == HTTPStatus.OK
 
 
 @pytest.mark.parametrize(
     'url, parametrized_client, expected_status',
     (
-        (HOME_URL, pytest.lazy_fixture('client'), HTTPStatus.OK),
-        (LOGIN_URL, pytest.lazy_fixture('client'), HTTPStatus.OK),
-        (SIGNUP_URL, pytest.lazy_fixture('client'), HTTPStatus.OK),
+        (
+            pytest.lazy_fixture('home_url'),
+            pytest.lazy_fixture('client'),
+            HTTPStatus.OK,
+        ),
+        (
+            pytest.lazy_fixture('login_url'),
+            pytest.lazy_fixture('client'),
+            HTTPStatus.OK,
+        ),
+        (
+            pytest.lazy_fixture('signup_url'),
+            pytest.lazy_fixture('client'),
+            HTTPStatus.OK,
+        ),
         (
             pytest.lazy_fixture('detail_url'),
             pytest.lazy_fixture('client'),
@@ -60,7 +66,7 @@ def test_pages_availability(url, parametrized_client, expected_status):
     'url',
     (pytest.lazy_fixture('edit_url'), pytest.lazy_fixture('delete_url')),
 )
-def test_redirect_for_anonymous_client(client, url):
-    expected_url = f'{LOGIN_URL}?next={url}'
+def test_redirect_for_anonymous_client(client, url, login_url):
+    expected_url = f'{login_url}?next={url}'
     response = client.get(url)
     assertRedirects(response, expected_url)
